@@ -4,6 +4,8 @@
 
 因笔者对于git和github操作的不熟练，本文用于整理汇总Git以及Github的使用操作，方便随时翻阅查看。
 
+
+
 ### Git基础命令
 
 #### git init
@@ -90,7 +92,7 @@ git checkout 文件名，撤销还未add进暂存区的文件
 
 新建并切换到分支a
 
-#### git merge
+#### git merge 
 
 合并分支，如git merge a，合并a分支到当前分支
 
