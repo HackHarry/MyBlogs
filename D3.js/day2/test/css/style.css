@@ -1,0 +1,31 @@
+#siderbar {
+	width: 25%;
+	height: 100%;
+	float: left;
+	clear: left;
+	border: 1px solid gray;
+	border-radius: 5px;
+}
+
+#maincontent {
+	width: 73%;
+	height: 100%;
+	float: right;
+	clear: right;
+	text-align: center;
+	border: 1px solid gray;
+	border-radius: 5px;
+	font-size: 20px;
+}
+
+.pstyle {
+	color: red;
+	background-color: yellow;
+	font-size: 22px;
+}
+
+.important { color: red; }
+
+h1 {
+	color: blue;
+}

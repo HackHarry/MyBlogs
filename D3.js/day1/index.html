@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+	</head>
+	<body>
+		<p>cat</p>
+		<p>dog</p>
+		<button type="button" onclick="mysort()">排序</button>
+		<button type="button" onclick="myadd()">增加数据</button>
+		<script src = "js/d3/d3.js" charset = "utf-8"></script>
+		<script>
+			var p = d3.select("body")
+						.selectAll("p")
+						.text("Hello, world!");
+			p.style("color", "red");
+			p.style("font-size", "72px");
+
+			//绘制svg区域
+			var width = 800;
+			var height = 400;
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", width)
+						.attr("height", height);
+			
+			var dataset = [50,43,120,87,99,167,142];
+			var padding = {top:20, right:20, bottom:20, left:20};
+			var rectStep = 35;
+			var rectWidth = 30;
+			
+			function draw() {
+				//console.log(dataset);
+				var updateRect = svg.selectAll("rect").data(dataset);
+				var enterRect = updateRect.enter();
+				var exitRect = updateRect.exit();
+				
+				updateRect.attr("fill", "blue")
+							.attr("x", function(d,i) {return padding.left + i*rectStep;})
+							.attr("y", function(d) {return height - padding.bottom - d;})
+							.attr("width", rectWidth)
+							.attr("height", function(d) {return d;});
+				enterRect.append("rect")
+							.attr("fill", "blue")
+							.attr("x", function(d,i) {return padding.left + i*rectStep;})
+							.attr("y", function(d) {return height - padding.bottom - d;})
+							.attr("width", rectWidth)
+							.attr("height", function(d) {return d;});
+				exitRect.remove();
+
+				var updateText = svg.selectAll("text").data(dataset);
+				var enterText = updateText.enter();
+				var exitText = updateText.exit();
+
+				updateText.attr("fill", "white")
+							.attr("font-size", "14px")
+							.attr("text-anchor", "middle")
+							.attr("x", function(d,i) {return padding.left + i*rectStep;})
+							.attr("y", function(d) {return height - padding.bottom - d;})
+							.attr("dx", rectWidth/2)
+							.attr("dy", "1em")
+							.text(function(d) {return d;});
+				enterText.append("text")
+							.attr("fill", "white")
+							.attr("font-size", "14px")
+							.attr("text-anchor", "middle")
+							.attr("x", function(d,i) {return padding.left + i*rectStep;})
+							.attr("y", function(d) {return height - padding.bottom - d;})
+							.attr("dx", rectWidth/2)
+							.attr("dy", "1em")
+							.text(function(d) {return d;});
+				exitText.remove();
+			}
+
+			function mysort() {
+				dataset.sort(d3.ascending);
+				draw();
+			}
+
+			function myadd() {
+				dataset.push(Math.floor(Math.random()*100));
+				draw();
+			}
+
+			/*
+			var rect = svg.selectAll("rect")
+							.data(dataset)
+							.enter()
+							.append("rect")
+							.attr("fill", "blue")
+							.attr("x", function(d,i) {return padding.left + i*rectStep;})
+							.attr("y", function(d) {return height - padding.bottom - d;})
+							.attr("width", rectWidth)
+							.attr("height", function(d) {return d;});
+			var text = svg.selectAll("text")
+							.data(dataset)
+							.enter()
+							.append("text")
+							.attr("fill", "white")
+							.attr("font-size", "14px")
+							.attr("text-anchor", "middle")
+							.attr("x", function(d,i) {return padding.left + i*rectStep;})
+							.attr("y", function(d) {return height - padding.bottom - d;})
+							.attr("dx", rectWidth/2)
+							.attr("dy", "1em")
+							.text(function(d) {return d;});
+			*/
+			/*svg.append("circle")
+				.attr("cx", "50px")
+				.attr("cy", "50px")
+				.attr("r", "50px")
+				.attr("fill", "red");*/
+			console.log("OK!!!!");
+		</script>
+	</body>
+</html>
