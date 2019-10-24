@@ -67,7 +67,7 @@ setTimeout(function() {
 1. pointArr数组元素的类型是BMap.Point，我就是因为没有注意这个问题，而导致回调函数根本没有被执行。而如果传入的类型错误，它不会报错，而只是给个警告。
 2. 坐标转换接口的调用似乎是有上限的，根据测试，一次最多调用10个点，因此如果有大量点需要转换，我想到两个方法。一个是分组转换，还有一个是事先预处理，提前将点转换为百度坐标。
 
-#### 标注
+### 标注
 
 然后是向地图添加标注的操作，标注是BMap下的Marker类，添加方法是addOverlay()。
 
@@ -136,3 +136,87 @@ marker.addEventListener("dragend", function(e){
 ---
 
 以上就是我到目前为止用到的百度地图API的操作。
+
+
+
+# 二
+
+这次，我做的工作主要有两个，一是用Python对坐标进行预处理，二是在两个点之间绘制折线来表示路径。其中Python的预处理工作有两个，一个是计算坐标，另一个是转换坐标。
+
+首先讲讲为什么要用Python而不是直接用JavaScript。
+
+我所需要做的事情是绘制每分钟自行车的位置，并将其与出发点连线。考虑到数据量比较大，实时计算位置会很慢，因此我打算预先计算好每分钟所有自行车的位置。由于每辆自行车需要和出发点连线，因此还需要存下出发点的坐标，而多辆自行车可能有同一个出发点，因此我用一个数组专门存出发点坐标，然后每辆自行车存下对应出发点数组的下标。
+
+这个思路应该是没有问题的，但当我实际操作时候就发现问题了。先回顾一下JavaScript坐标转换的代码。
+
+```javascript
+translateCallback = function (data) {
+    if(data.status === 0) {
+        var marker = new BMap.Marker(data.points[0]);
+        bm.addOverlay(marker);
+        var label = new BMap.Label("转换后的百度坐标（正确）",{offset:new BMap.Size(20,-10)});
+        marker.setLabel(label); //添加百度label
+        bm.setCenter(data.points[0]);
+    }
+}
+
+setTimeout(function() {
+    var convertor = new BMap.Convertor();
+    var pointArr = [];
+    pointArr.push(ggPoint);
+    convertor.translate(pointArr, 1, 5, translateCallback)
+}, 1000);
+```
+
+实际操作中发现，传入的pointArr和返回函数中的data.points很难一一对应上。此外，JavaScript中这两个函数似乎是异步的，并非是setTimeout执行一次，translateCallback就执行一次，因此就算在外围定义全局变量也难以实现对应关系。于是，我就考虑用Python对坐标进行预处理。
+
+### Python调用百度地图API
+
+Python调用API是通过http/https形式发起检索请求，获取返回json或xml格式的检索数据，这里需要有一点点爬虫的知识。
+
+说起来有一个有趣的事情，上次我对JavaScript中转换坐标函数的参数1和5的解释，在这里的文档里有详细的介绍，的确是表示不同类型的坐标，总共有8种。
+
+因为这种调用方式是WebAPI，官方文档没有给出具体语言的具体代码，以下是我自己写的代码。
+
+```python
+import requests
+import time
+
+def convertor(coords):
+    url = 'http://api.map.baidu.com/geoconv/v1/?'
+    payload = {
+        'coords': '{}, {}'.format(coords[0], coords[1]),
+        'from': 1,
+        'to': 5,
+        'ak': '密钥'
+    }
+    while True:
+        response = requests.get(url=url, params=payload)
+        time.sleep(0.01)
+        if response.json()['status'] == 0:
+            return response.json()['result'][0]
+```
+
+关于请求参数、返回结果参数和状态码，官方文档有详细的介绍，我就偷个懒吧。
+
+### 绘制折线
+
+折线在地图上绘制为一系列直线段。可以自定义这些线段的颜色、粗细和透明度。颜色可以是十六进制数字形式（比如：#ff0000）或者是颜色关键字（比如：red）。
+
+以下代码段会在两点之间创建6像素宽的蓝色折线：
+
+```javascript
+var polyline = new BMap.Polyline([
+		station[station_id],
+		point_xy
+	],
+	{strokeColor:"blue", strokeWeight:6, strokeOpacity:0.5}
+);
+map.addOverlay(polyline);
+```
+
+---
+
+虽然这次更新讲起来，好像没什么内容，但我在纠结数据该怎么存的时候花了很长时间，而因为数据量比较大，跑Python数据就跑了半天。最开始时候，我是打算一次跑完数据再写入文件里，但是都是跑到一半就失败了，我以为是接口调用太频繁，就一直修改sleep的值，结果发现似乎是数据太大，存在一个变量里存不下了。
+
+总而言之，数据处理这块还是有很多坑的，也有我经验不足、没能事先想好的原因在里面，还是花了不少时间。
