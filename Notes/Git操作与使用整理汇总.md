@@ -101,3 +101,43 @@ git checkout 文件名，撤销还未add进暂存区的文件
 删除分支，如git branch -d a
 
 git branch -D为强制删除操作
+
+
+
+### 初次使用
+
+今天我给我的笔记本换了个固态，所以系统什么的都重装了一遍，刚好可以做一下初次使用git该如何操作的记录。
+
+#### 配置ssh密钥
+
+```git
+ssh-keygen -t rsa -C "Your_Email@Yourmail.com"
+```
+
+windows下，输入之后再按三个回车，会在 C:/Users/用户名/.ssh/ 生成两个文件，私钥 `id_rsa` 和公钥 `id_rsa.pub` 。
+
+#### 建立和github的连接
+
+用文本编辑器打开公钥文件，将里面内容复制出来。
+
+然后打开github，找到Settings - SSH and GPG keys目录下，将复制的内容粘贴进去。
+
+然后测试一下能否连上GitHub
+
+```
+ssh -T git@github.com
+```
+
+如果看到”Hi，xxxx……“，说明连接成功。
+
+#### 设置git账户信息
+
+```
+git config --global user.name "yourname"  
+git config --global user.email "yourmail@mail.com"
+```
+
+这里的name和mail要和GitHub上的信息保持一致。
+
+
+
