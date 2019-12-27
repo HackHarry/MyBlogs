@@ -1,0 +1,14 @@
+任务“bootloader”出现 Boost.Python 错误。
+<class 'subprocess.CalledProcessError'>
+Command 'grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Manjaro --force' returned non-zero exit status 1.
+Traceback:
+  File "/usr/lib/calamares/modules/bootloader/main.py", line 348, in run
+    prepare_bootloader(fw_type)
+
+  File "/usr/lib/calamares/modules/bootloader/main.py", line 319, in prepare_bootloader
+    install_grub(efi_directory, fw_type)
+
+  File "/usr/lib/calamares/modules/bootloader/main.py", line 244, in install_grub
+    "--force"])
+
+  File "<string>", line 2, in <module>
